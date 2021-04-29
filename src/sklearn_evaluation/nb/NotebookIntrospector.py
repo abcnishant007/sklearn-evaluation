@@ -73,6 +73,26 @@ def _parse_output(output, literal_eval, to_df, text_only):
                                                                to_df=to_df)
 
 
+def find_cell_with_tag(cells):
+    for cell in cells:
+        if ('metadata' in cell and 'tags' in cell['metadata']
+                and 'parameters' in cell['metadata']['tags']):
+            return cell
+
+
+def parse_parameters_cell(cells):
+    # this is a very simple implementation, for a more robust solution
+    # re-implement with ast or parso
+    cell = find_cell_with_tag(cells)
+
+    if not cell:
+        return dict()
+
+    tuples = [line.split('=') for line in cell['source'].splitlines()]
+
+    return {t[0].strip(): ast.literal_eval(t[1].strip()) for t in tuples}
+
+
 class NotebookIntrospector(Mapping):
     """Retrieve output from a notebook file with tagged cells.
 
@@ -145,3 +165,6 @@ class NotebookIntrospector(Mapping):
                              text_only=True)
             for k, v in self.tag2output_raw.items()
         }
+
+    def get_params(self):
+        return parse_parameters_cell(self.nb.cells)

@@ -1,3 +1,5 @@
+import ast
+
 from sklearn_evaluation import NotebookIntrospector
 from IPython.display import HTML, Image
 
@@ -50,3 +52,19 @@ def test_json_serializable(tmp_directory, nb_plot):
     # "<Figure size YxZ with 1 Axes>")
     assert 'Figure size' in d['a']
     assert d['b'] == 42
+
+
+def test_get_params(tmp_directory, nb_parameters):
+    d = NotebookIntrospector('nb_parameters.ipynb')
+    assert d.get_params() == {
+        'x': 1,
+        'y': [1, 2],
+        'z': {
+            'a': 1,
+            'b': 2
+        },
+        'z': {
+            'a': 1,
+            'b': 2
+        }
+    }

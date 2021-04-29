@@ -101,3 +101,16 @@ import numpy as np
 np.array([1, 2, 3])
 """
     return save_and_execute_notebook(content, 'nb_invalid_output.ipynb')
+
+
+@pytest.fixture
+def nb_parameters():
+    content = """
+import numpy as np
+
+# + tags=["parameters"]
+x = 1
+y = [1, 2]
+z = {'a': 1, 'b': 2}
+"""
+    return save_and_execute_notebook(content, 'nb_parameters.ipynb')
