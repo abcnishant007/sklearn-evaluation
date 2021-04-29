@@ -73,22 +73,25 @@ def _parse_output(output, literal_eval, to_df, text_only):
                                                                to_df=to_df)
 
 
-def find_cell_with_tag(cells):
+def find_cell_with_tag(cells, tag):
     for cell in cells:
         if ('metadata' in cell and 'tags' in cell['metadata']
-                and 'parameters' in cell['metadata']['tags']):
+                and tag in cell['metadata']['tags']):
             return cell
 
 
-def parse_parameters_cell(cells):
+def parse_injected_parameters_cell(cells):
     # this is a very simple implementation, for a more robust solution
     # re-implement with ast or parso
-    cell = find_cell_with_tag(cells)
+    cell = find_cell_with_tag(cells, tag='injected-parameters')
 
     if not cell:
         return dict()
 
-    tuples = [line.split('=') for line in cell['source'].splitlines()]
+    tuples = [
+        line.split('=') for line in cell['source'].splitlines()
+        if not line.startswith('#')
+    ]
 
     return {t[0].strip(): ast.literal_eval(t[1].strip()) for t in tuples}
 
@@ -166,5 +169,5 @@ class NotebookIntrospector(Mapping):
             for k, v in self.tag2output_raw.items()
         }
 
-    def get_params(self):
-        return parse_parameters_cell(self.nb.cells)
+    def get_injected_parameters(self):
+        return parse_injected_parameters_cell(self.nb.cells)

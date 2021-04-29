@@ -54,15 +54,12 @@ def test_json_serializable(tmp_directory, nb_plot):
     assert d['b'] == 42
 
 
-def test_get_params(tmp_directory, nb_parameters):
-    d = NotebookIntrospector('nb_parameters.ipynb')
-    assert d.get_params() == {
+def test_get_injected_parameters(tmp_directory, nb_injected_parameters):
+    d = NotebookIntrospector('nb_injected_parameters.ipynb')
+
+    assert d.get_injected_parameters() == {
         'x': 1,
         'y': [1, 2],
-        'z': {
-            'a': 1,
-            'b': 2
-        },
         'z': {
             'a': 1,
             'b': 2
