@@ -117,6 +117,20 @@ x = 1
 y = [1, 2]
 z = {'a': 1, 'b': 2}
 """
-    return save_notebook(content,
-                         'nb_injected_parameters.ipynb',
-                         execute=False)
+    return save_notebook(content, 'nb.ipynb', execute=False)
+
+
+@pytest.fixture
+def nb_injected_parameters_multiple_lines():
+    content = """
+import numpy as np
+
+# + tags=["injected-parameters"]
+# Parameters
+x = 1
+y = [1,
+    2,]
+z = {'a': 1,
+     'b': 2}
+"""
+    return save_notebook(content, 'nb.ipynb', execute=False)

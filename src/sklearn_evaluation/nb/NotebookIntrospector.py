@@ -2,6 +2,7 @@ import base64
 from collections.abc import Mapping
 import ast
 
+import parso
 import pandas as pd
 import nbformat
 from IPython.display import Image, HTML
@@ -88,12 +89,27 @@ def parse_injected_parameters_cell(cells):
     if not cell:
         return dict()
 
-    tuples = [
-        line.split('=') for line in cell['source'].splitlines()
-        if not line.startswith('#')
+    children = parso.parse(cell['source']).children
+
+    statements = [
+        _process_stmt(c) for c in children
+        if c.type in {'simple_stmt', 'expr_stmt'}
     ]
 
-    return {t[0].strip(): ast.literal_eval(t[1].strip()) for t in tuples}
+    return {
+        stmt.children[0].value:
+        ast.literal_eval(stmt.children[2].get_code().strip())
+        for stmt in statements if stmt is not None
+    }
+
+
+def _process_stmt(stmt):
+    if stmt.type == 'expr_stmt':
+        return stmt
+    else:
+        for c in stmt.children:
+            if c.type == 'expr_stmt':
+                return c
 
 
 class NotebookIntrospector(Mapping):

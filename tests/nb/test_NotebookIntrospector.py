@@ -1,5 +1,3 @@
-import ast
-
 from sklearn_evaluation import NotebookIntrospector
 from IPython.display import HTML, Image
 
@@ -55,7 +53,21 @@ def test_json_serializable(tmp_directory, nb_plot):
 
 
 def test_get_injected_parameters(tmp_directory, nb_injected_parameters):
-    d = NotebookIntrospector('nb_injected_parameters.ipynb')
+    d = NotebookIntrospector('nb.ipynb')
+
+    assert d.get_injected_parameters() == {
+        'x': 1,
+        'y': [1, 2],
+        'z': {
+            'a': 1,
+            'b': 2
+        }
+    }
+
+
+def test_get_injected_parameters_multiple_lines(
+        tmp_directory, nb_injected_parameters_multiple_lines):
+    d = NotebookIntrospector('nb.ipynb')
 
     assert d.get_injected_parameters() == {
         'x': 1,
